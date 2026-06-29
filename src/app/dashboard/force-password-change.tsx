@@ -15,10 +15,9 @@ export function ForcePasswordChange() {
     
     try {
       await changePassword(formData)
-      // Since NextAuth session doesn't auto-refresh Server components without a hard reload,
-      // the safest way to unlock the dashboard is to force a sign-in refresh by reloading.
-      // Wait, we can just reload the page and let layout.tsx re-fetch the session from DB!
-      window.location.reload()
+      // The database is updated, but the user's current JWT cookie still has forcePasswordChange: true.
+      // To refresh it, we securely sign them out and ask them to log in with their brand new password!
+      await signOut({ callbackUrl: "/login?message=Password updated successfully. Please log in." })
     } catch (err: any) {
       setError(err.message || "An error occurred")
       setLoading(false)
