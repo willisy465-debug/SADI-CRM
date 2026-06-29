@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
 import { Shield, Home, Users, Briefcase, FileText, Settings, LogOut, GraduationCap, LayoutDashboard, Inbox, Target, Building2, DollarSign, UserCheck, CheckSquare, FolderOpen, BadgeInfo } from "lucide-react"
+import { ForcePasswordChange } from "./force-password-change"
 
 const NAVIGATION = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -28,6 +29,15 @@ export default async function DashboardLayout({
 
   if (!session?.user) {
     redirect("/login")
+  }
+
+  // Force password change check
+  if ((session.user as any).forcePasswordChange) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+        <ForcePasswordChange />
+      </div>
+    )
   }
 
   return (

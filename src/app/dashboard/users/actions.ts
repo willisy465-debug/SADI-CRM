@@ -3,6 +3,9 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
+import bcrypt from "bcryptjs"
+import crypto from "crypto"
+import { sendWelcomeEmail } from "@/lib/email"
 
 export async function createUser(formData: FormData) {
   const session = await auth()
@@ -16,15 +19,25 @@ export async function createUser(formData: FormData) {
   const email = formData.get("email") as string
   const role = formData.get("role") as string
   
+  // Auto-generate an 8-character random password
+  const generatedPassword = crypto.randomBytes(4).toString("hex") // e.g. "a1b2c3d4"
+  
+  // Hash the password securely
+  const hashedPassword = await bcrypt.hash(generatedPassword, 10)
+
   // Create user
   await prisma.user.create({
     data: {
       name,
       email,
       role,
-      password: "password123" // Default password
+      password: hashedPassword,
+      forcePasswordChange: true
     }
   })
+
+  // Send the email with the generated password
+  await sendWelcomeEmail(email, name, generatedPassword)
 
   revalidatePath("/dashboard/users")
 }

@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String?  // nullable for OAuth
-  name      String?
-  role      String   @default("USER") // USER, ADMIN, SALES, MANAGER
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  password            String?  // nullable for OAuth
+  forcePasswordChange Boolean  @default(true)
+  name                String?
+  role                String   @default("USER") // USER, ADMIN, SALES, MANAGER
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   leads        Lead[]
   accounts     Account[]

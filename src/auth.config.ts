@@ -23,6 +23,7 @@ export const authConfig = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.forcePasswordChange = (user as any).forcePasswordChange
       }
       return token
     },
@@ -30,6 +31,7 @@ export const authConfig = {
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
+        ;(session.user as any).forcePasswordChange = token.forcePasswordChange
       }
       return session
     }
