@@ -1,0 +1,286 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?  // nullable for OAuth
+  name      String?
+  role      String   @default("USER") // USER, ADMIN, SALES, MANAGER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads        Lead[]
+  accounts     Account[]
+  deals        Deal[]
+  staffProfile StaffProfile?
+  expenses     Expense[]
+  tasks        Task[]
+  projects     Project[] @relation("ProjectLead")
+  documents    Document[]
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  company   String?
+  status    String   @default("NEW") // NEW, CONTACTED, QUALIFIED, LOST
+  source    String?
+  ownerId   String?
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id        String    @id @default(cuid())
+  name      String
+  industry  String?
+  website   String?
+  ownerId   String?
+  owner     User?     @relation(fields: [ownerId], references: [id])
+  contacts  Contact[]
+  deals     Deal[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  accountId String?
+  account   Account?   @relation(fields: [accountId], references: [id])
+  delegates Delegate[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Deal {
+  id                String     @id @default(cuid())
+  name              String
+  amount            Float?
+  stage             String     @default("PROSPECTING") // PROSPECTING, QUALIFICATION, PROPOSAL, WON, LOST
+  accountId         String?
+  account           Account?   @relation(fields: [accountId], references: [id])
+  ownerId           String?
+  owner             User?      @relation(fields: [ownerId], references: [id])
+  expectedCloseDate DateTime?
+  programme         Programme?
+  invoices          Invoice[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model Programme {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  type        String      @default("IN_PERSON") // IN_PERSON, VIRTUAL, HYBRID
+  status      String      @default("DRAFT") // DRAFT, CONFIRMED, COMPLETED, CANCELLED
+  dealId      String?     @unique
+  deal        Deal?       @relation(fields: [dealId], references: [id])
+  
+  delegates    Delegate[]
+  facilitators FacilitatorAssignment[]
+  logistics    Logistics?
+  invoices     Invoice[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Delegate {
+  id              String     @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String
+  phone           String?
+  company         String?
+  dateOfBirth     DateTime?
+  emergencyContact String?
+  jobTitle        String?
+  dietaryReqs     String?    // e.g., "Vegetarian", "Halal"
+  attendance      Boolean    @default(false)
+  programmeId     String
+  programme       Programme  @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  contactId       String?
+  contact         Contact?   @relation(fields: [contactId], references: [id])
+  
+  certificateUrl  String?
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Facilitator {
+  id          String                  @id @default(cuid())
+  name        String
+  email       String                  @unique
+  phone       String?
+  expertise   String?
+  rate        Float?
+  assignments FacilitatorAssignment[]
+
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+}
+
+model FacilitatorAssignment {
+  id             String       @id @default(cuid())
+  programmeId    String
+  programme      Programme    @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  facilitatorId  String
+  facilitator    Facilitator  @relation(fields: [facilitatorId], references: [id], onDelete: Cascade)
+  role           String       @default("LEAD") // LEAD, CO_FACILITATOR
+  agreedRate     Float?
+
+  createdAt      DateTime     @default(now())
+  @@unique([programmeId, facilitatorId])
+}
+
+model Logistics {
+  id            String     @id @default(cuid())
+  venueName     String?
+  venueAddress  String?
+  cateringNotes String?
+  equipmentReqs String?
+  programmeId   String     @unique
+  programme     Programme  @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Invoice {
+  id          String      @id @default(cuid())
+  invoiceNo   String      @unique // e.g., "INV-2026-001"
+  amount      Float
+  status      String      @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE
+  issueDate   DateTime    @default(now())
+  dueDate     DateTime
+  
+  dealId      String?
+  deal        Deal?       @relation(fields: [dealId], references: [id])
+  programmeId String?
+  programme   Programme?  @relation(fields: [programmeId], references: [id])
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Expense {
+  id          String      @id @default(cuid())
+  description String
+  amount      Float
+  startDate   DateTime
+  endDate     DateTime
+  category    String      // e.g., TRAVEL, CATERING, SOFTWARE, OFFICE
+  receiptUrl  String?     // Link to uploaded receipt image
+  status      String      @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  submittedBy String
+  submitter   User        @relation(fields: [submittedBy], references: [id])
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model StaffProfile {
+  id            String     @id @default(cuid())
+  userId        String     @unique
+  user          User       @relation(fields: [userId], references: [id])
+  
+  department    String?    // e.g., Sales, Operations, Finance
+  jobTitle      String?
+  joinDate      DateTime?
+  baseSalary    Float?
+  
+  leaveBalances Float      @default(21) // Days per year
+  
+  leaves        LeaveApplication[]
+}
+
+model LeaveApplication {
+  id          String       @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  type        String       // ANNUAL, SICK, MATERNITY, UNPAID
+  reason      String?
+  status      String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  staffId     String
+  staff       StaffProfile @relation(fields: [staffId], references: [id])
+
+  createdAt   DateTime     @default(now())
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String   @default("TODO") // TODO, IN_PROGRESS, COMPLETED
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+
+  assignedTo  String
+  assignee    User     @relation(fields: [assignedTo], references: [id])
+
+  relatedLeadId    String?
+  relatedAccountId String?
+  relatedDealId    String?
+  projectId        String?
+  project          Project? @relation(fields: [projectId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  category    String   @default("GENERAL") // TEMPLATE, CONTRACT, TRAINING_MATERIAL, GENERAL
+  
+  uploadedBy  String
+  uploader    User     @relation(fields: [uploadedBy], references: [id])
+
+  relatedAccountId String?
+  relatedDealId    String?
+  relatedProgId    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("ACTIVE") // ACTIVE, COMPLETED, ON_HOLD, CANCELLED
+  
+  leadId      String
+  lead        User     @relation("ProjectLead", fields: [leadId], references: [id])
+  
+  tasks       Task[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
