@@ -216,6 +216,7 @@ model StaffProfile {
   leaveBalances Float      @default(21) // Days per year
   
   leaves        LeaveApplication[]
+  attendance    AttendanceRecord[]
 }
 
 model LeaveApplication {
@@ -283,5 +284,42 @@ model Project {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model OfficeLocation {
+  id           String   @id @default(cuid())
+  name         String   // e.g., "Pretoria Campus", "Nairobi Campus"
+  latitude     Float
+  longitude    Float
+  radiusMeters Float    @default(20.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  attendanceRecords AttendanceRecord[]
+}
+
+model AttendanceRecord {
+  id            String       @id @default(cuid())
+  staffId       String
+  staff         StaffProfile @relation(fields: [staffId], references: [id])
+  
+  date          DateTime     // Normalised to midnight for grouping
+  checkInTime   DateTime
+  checkOutTime  DateTime?
+  
+  checkInLat    Float
+  checkInLng    Float
+  checkOutLat   Float?
+  checkOutLng   Float?
+  
+  status        String       @default("PRESENT") // PRESENT, LATE, HALF_DAY
+  overtimeHours Float        @default(0.0)
+  
+  locationId    String?
+  location      OfficeLocation? @relation(fields: [locationId], references: [id])
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([staffId, date]) // Ensure one record per staff per day (for standard shifts)
 }
 
