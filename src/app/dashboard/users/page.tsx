@@ -94,13 +94,20 @@ export default async function UsersPage() {
                     {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      disabled={user.id === session.user.id} 
-                      className="h-8 w-8 p-0 text-slate-500 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-30"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <form action={async () => {
+                      "use server"
+                      const { deleteUser } = await import("./actions")
+                      await deleteUser(user.id)
+                    }}>
+                      <Button 
+                        type="submit"
+                        variant="ghost" 
+                        disabled={user.id === session.user.id} 
+                        className="h-8 w-8 p-0 text-slate-500 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-30"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </form>
                   </TableCell>
                 </TableRow>
               ))

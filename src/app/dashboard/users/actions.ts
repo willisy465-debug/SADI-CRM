@@ -26,7 +26,7 @@ export async function createUser(formData: FormData) {
   const hashedPassword = await bcrypt.hash(generatedPassword, 10)
 
   // Create user
-  await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       name,
       email,
@@ -36,10 +36,21 @@ export async function createUser(formData: FormData) {
     }
   })
 
+  // Automatically create a Staff Profile for the new user
+  await prisma.staffProfile.create({
+    data: {
+      userId: newUser.id,
+      department: role === "SALES" ? "Sales" : "Administration",
+      jobTitle: role,
+      joinDate: new Date()
+    }
+  })
+
   // Send the email with the generated password
   await sendWelcomeEmail(email, name, generatedPassword)
 
   revalidatePath("/dashboard/users")
+  revalidatePath("/dashboard/hr")
 }
 
 export async function deleteUser(userId: string) {

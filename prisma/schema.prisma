@@ -206,7 +206,7 @@ model Expense {
 model StaffProfile {
   id            String     @id @default(cuid())
   userId        String     @unique
-  user          User       @relation(fields: [userId], references: [id])
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   department    String?    // e.g., Sales, Operations, Finance
   jobTitle      String?
