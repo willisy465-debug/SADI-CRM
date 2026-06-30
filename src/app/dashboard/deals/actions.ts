@@ -12,6 +12,7 @@ export async function createDeal(formData: FormData) {
   const amountStr = formData.get("amount") as string
   const accountId = formData.get("accountId") as string
   const stage = formData.get("stage") as string
+  const expectedCloseDateStr = formData.get("expectedCloseDate") as string
 
   const deal = await prisma.deal.create({
     data: {
@@ -20,6 +21,7 @@ export async function createDeal(formData: FormData) {
       stage: stage || "PROSPECTING",
       accountId: accountId || null,
       ownerId: session.user.id,
+      expectedCloseDate: expectedCloseDateStr ? new Date(expectedCloseDateStr) : null,
     }
   })
 

@@ -26,6 +26,8 @@ import { Plus, Loader2 } from "lucide-react"
 export function NewDealDialog({ accounts }: { accounts: { id: string, name: string }[] }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [accountId, setAccountId] = useState("")
+  const [stage, setStage] = useState("PROSPECTING")
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -66,7 +68,8 @@ export function NewDealDialog({ accounts }: { accounts: { id: string, name: stri
           </div>
           <div className="space-y-2">
             <Label htmlFor="accountId" className="text-slate-700">Associated Account</Label>
-            <Select name="accountId" required>
+            <input type="hidden" name="accountId" value={accountId} />
+            <Select required value={accountId} onValueChange={setAccountId}>
               <SelectTrigger className="bg-slate-100 border-slate-300 text-slate-900 focus:ring-brand-cyan">
                 <SelectValue placeholder="Select an account" />
               </SelectTrigger>
@@ -79,7 +82,8 @@ export function NewDealDialog({ accounts }: { accounts: { id: string, name: stri
           </div>
           <div className="space-y-2">
             <Label htmlFor="stage" className="text-slate-700">Pipeline Stage</Label>
-            <Select name="stage" defaultValue="PROSPECTING">
+            <input type="hidden" name="stage" value={stage} />
+            <Select value={stage} onValueChange={setStage}>
               <SelectTrigger className="bg-slate-100 border-slate-300 text-slate-900 focus:ring-brand-cyan">
                 <SelectValue placeholder="Select a stage" />
               </SelectTrigger>
@@ -91,6 +95,10 @@ export function NewDealDialog({ accounts }: { accounts: { id: string, name: stri
                 <SelectItem value="LOST">Closed Lost</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="expectedCloseDate" className="text-slate-700">Expected Close Date</Label>
+            <Input id="expectedCloseDate" name="expectedCloseDate" type="date" required className="bg-slate-100 border-slate-300 focus-visible:ring-brand-cyan" />
           </div>
           <DialogFooter className="pt-4">
             <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="hover:bg-slate-100 text-slate-700">
