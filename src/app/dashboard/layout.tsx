@@ -43,13 +43,13 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-slate-200 bg-white/50">
-          <Shield className="w-5 h-5 text-brand-cyan mr-3" />
-          <span className="font-semibold tracking-wide">SADI CRM</span>
+      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10">
+        <div className="h-20 flex items-center px-6 border-b border-slate-200 bg-white">
+          <img src="/Logo.jpg" alt="SADI Logo" className="h-10 mr-4 object-contain rounded" />
+          <span className="font-bold text-lg tracking-wide text-brand-navy">SADI CRM</span>
         </div>
         
-        <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 py-8 px-5 space-y-2 overflow-y-auto">
           {NAVIGATION.map((item) => {
             if (item.adminOnly && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
               return null
@@ -58,9 +58,9 @@ export default async function DashboardLayout({
               <a 
                 key={item.name} 
                 href={item.href} 
-                className="flex items-center px-3 py-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center px-4 py-3 text-slate-600 hover:text-brand-navy hover:bg-slate-50 rounded-xl text-base font-medium transition-all group"
               >
-                <item.icon className="w-4 h-4 mr-3" /> {item.name}
+                <item.icon className="w-5 h-5 mr-4 text-slate-400 group-hover:text-brand-cyan transition-colors" /> {item.name}
               </a>
             )
           })}
@@ -79,21 +79,21 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 flex items-center justify-between px-8 border-b border-slate-200 bg-slate-50/50 backdrop-blur-md">
-          <div className="flex items-center text-slate-600 text-sm">
+      <main className="flex-1 flex flex-col min-w-0 bg-slate-50/50">
+        <header className="h-20 flex items-center justify-between px-10 border-b border-slate-200 bg-white/80 backdrop-blur-md z-10 sticky top-0">
+          <div className="flex items-center text-slate-700 text-base font-medium">
             <span>Welcome back, {session.user.name}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="text-slate-600 hover:text-slate-900 transition-colors">
-              <Settings className="w-5 h-5" />
+          <div className="flex items-center gap-6">
+            <button className="text-slate-400 hover:text-brand-cyan transition-colors">
+              <Settings className="w-6 h-6" />
             </button>
-            <div className="w-8 h-8 rounded-full bg-brand-navy flex items-center justify-center text-sm font-semibold shadow-inner shadow-white/20">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-navy to-brand-cyan flex items-center justify-center text-base font-bold text-white shadow-md">
               {session.user.name?.[0] || "U"}
             </div>
           </div>
         </header>
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto p-4 sm:p-8">
           {children}
         </div>
       </main>

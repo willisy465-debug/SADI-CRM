@@ -57,18 +57,18 @@ export default async function DashboardPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-slate-600 text-sm font-medium">Active Deals</h3>
-            <p className="text-3xl font-semibold text-slate-900 mt-2">{activeDeals}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+          <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow">
+            <h3 className="text-slate-500 text-base font-medium tracking-wide uppercase">Active Deals</h3>
+            <p className="text-4xl font-bold text-slate-900 mt-4">{activeDeals}</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-slate-600 text-sm font-medium">New Leads (This Week)</h3>
-            <p className="text-3xl font-semibold text-slate-900 mt-2">{newLeads}</p>
+          <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow">
+            <h3 className="text-slate-500 text-base font-medium tracking-wide uppercase">New Leads (This Week)</h3>
+            <p className="text-4xl font-bold text-slate-900 mt-4">{newLeads}</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-slate-600 text-sm font-medium">Pipeline Value</h3>
-            <p className="text-3xl font-semibold text-brand-cyan mt-2">
+          <div className="bg-gradient-to-br from-brand-navy to-blue-800 border border-transparent rounded-2xl p-8 shadow-lg text-white">
+            <h3 className="text-brand-cyan text-base font-medium tracking-wide uppercase">Pipeline Value</h3>
+            <p className="text-4xl font-bold mt-4">
               ZAR {pipelineValue.toLocaleString()}
             </p>
           </div>
